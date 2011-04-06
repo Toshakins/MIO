@@ -1,0 +1,8 @@
+It is Hungarian algorithm with application to transportation theory.
+
+structure of test file:
+
+num_of_sellers num_of_customers
+[customers data]
+[sellers data]
+[matrix data]
