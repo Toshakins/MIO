@@ -199,7 +199,22 @@ inline bool isSignificant(int i, int j) {
 }
 
 void eq_stage() {
-	;
+	double h = DBL_MAX;
+	for (USI j = 0; j < customers.size(); ++j) {
+		vector<short int>::iterator it = find(mark.column.begin(),
+				mark.column.end(), Plus);
+		if (it == mark.column.end() && *mark.column.end() != Plus)
+			continue;
+		for (USI i = 0; i < sellers.size(); ++i) {
+			vector<short int>::iterator it = find(mark.row.begin(),
+					mark.row.end(), Plus);
+			if (it == mark.row.end() && *mark.row.end() != Plus)
+				continue;
+			if (C[i][j] > 0 && C[i][j] < h)
+				h = C[i][j];
+		}
+	}
+	//????????
 }
 
 void search_stage() {
@@ -218,21 +233,23 @@ void search_stage() {
 				else {
 					mark.row[i] = Plus;
 					for (USI k = 0; k < customers.size(); ++k) {
-							vector<short int>::iterator itt = find(mark.column.begin(), mark.column\
-									.end(), Nothing);
-							if (it == mark.column.end() && *mark.column.end() != Nothing)
-								continue;
-							if (isSignificant(i, k)) {
-								mark.column[k] = Nothing;
-								stars.push_back(make_pair(i, k));
-							}
-							//may I forget search in unmarked column...
+						vector<short int>::iterator itt =
+								find(mark.column.begin(),
+										mark.column.end(), Nothing);
+						if (it == mark.column.end() && *mark.column.end() != Nothing)
+							continue;
+						if (isSignificant(i, k)) {
+							mark.column[k] = Nothing;
+							stars.push_back(make_pair(i, k));
+						}
+						//may I forgot to search in unmarked column...
 					}
 				}
 			}
 		}
 	}
 	eq_stage();
+	correction_stage();
 }
 
 int main(int argc, char *argv[]) {
