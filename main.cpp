@@ -1,19 +1,11 @@
 #include <iostream>
-#include <vector>
 #include <cfloat>
 #include <fstream>
 #include <algorithm>
 #include <utility>
-
-#define USI unsigned int
-#define MIN(a, b) ((a) < (b)) ? (a) : (b)
+#include "small.h"
 
 using namespace std;
-
-vector<vector<double> > matrix; //addressing: matrix[row][column]
-vector<vector<double> > X;
-vector<vector<double> > C;
-vector<double> customers, sellers;
 
 void input() {
 	int a, b;
@@ -33,27 +25,20 @@ void input() {
 }
 
 void output(vector <vector <double> > x) {
-	for (USI i = 0; i < sellers.size(); ++i) {
+	for (UINT i = 0; i < sellers.size(); ++i) {
 		cout << ' ' << sellers[i];
 	}
 	cout << endl << endl;
-	for (USI i = 0; i < customers.size(); ++i) {
+	for (UINT i = 0; i < customers.size(); ++i) {
 		cout << ' ' << customers[i];
 	}
 	cout << endl << endl;
-	for (USI i = 0; i < sellers.size(); ++i) {
-		for (USI j = 0; j < customers.size(); ++j) {
+	for (UINT i = 0; i < sellers.size(); ++i) {
+		for (UINT j = 0; j < customers.size(); ++j) {
 			cout << ' ' << x[i][j];
 		}
 		cout << endl;
 	}
-}
-
-double sum(vector<double> x) {
-	double ret = 0;
-	for (USI i = 0; i < x.size(); ++i)
-		ret += x[i];
-	return ret;
 }
 
 void balance() {
@@ -61,7 +46,7 @@ void balance() {
 	double s = sum(sellers);
 	if (s > c) {
 		customers.push_back(s - c);
-		for (USI i = 0; i < sellers.size(); ++i) {
+		for (UINT i = 0; i < sellers.size(); ++i) {
 			matrix[i].push_back(0); //add column
 		}
 	} else if (s < c) {
@@ -75,28 +60,28 @@ void balance() {
 void form_C() {
 	//create
 	C.resize(sellers.size());
-	for (USI j = 0; j < sellers.size(); ++j) {
+	for (UINT j = 0; j < sellers.size(); ++j) {
 		C[j].resize(customers.size(), 0);
 	}
 	//form C-zeroth
 	double min = DBL_MAX;
-	for (USI j = 0; j < customers.size(); ++j) {
-		for (USI i = 0; i < sellers.size(); ++i) {
+	for (UINT j = 0; j < customers.size(); ++j) {
+		for (UINT i = 0; i < sellers.size(); ++i) {
 			if (matrix[i][j] < min)
 				min = matrix[i][j];
 		}
-		for (USI i = 0; i < sellers.size(); ++i) {
+		for (UINT i = 0; i < sellers.size(); ++i) {
 			C[i][j] = matrix[i][j] - min;
 		}
 		min = DBL_MAX;
 	}
 	//form C'
-	for (USI i = 0; i < sellers.size(); ++i) {
-		for (USI j = 0; j < customers.size(); ++j) {
+	for (UINT i = 0; i < sellers.size(); ++i) {
+		for (UINT j = 0; j < customers.size(); ++j) {
 			if (C[i][j] < min)
 				min = C[i][j];
 		}
-		for (USI j = 0; j < customers.size(); ++j) {
+		for (UINT j = 0; j < customers.size(); ++j) {
 			C[i][j] = C[i][j] - min;
 		}
 		min = DBL_MAX;
@@ -106,11 +91,11 @@ void form_C() {
 void form_X() {
 	//create
 	X.resize(sellers.size());
-	for (USI j = 0; j < sellers.size(); ++j)
+	for (UINT j = 0; j < sellers.size(); ++j)
 		X[j].resize(customers.size(), 0);
 	//form and correction
-	for (USI j = 0; j < customers.size(); ++j) {
-		for (USI i = 0; i < sellers.size(); ++i) {
+	for (UINT j = 0; j < customers.size(); ++j) {
+		for (UINT i = 0; i < sellers.size(); ++i) {
 			if (C[i][j] == 0) {
 				X[i][j] = MIN(sellers[i], customers[j]);
 				sellers[i] -= X[i][j];
@@ -137,23 +122,23 @@ Disrepancy::Disrepancy() {
 
 void Disrepancy::compute() {
 	double sum_row = 0, sum_column = 0;
-	for (USI i = 0; i < sellers.size(); ++i) {
-		for (USI j = 0; j < customers.size(); ++j) {
+	for (UINT i = 0; i < sellers.size(); ++i) {
+		for (UINT j = 0; j < customers.size(); ++j) {
 			sum_column += X[i][j];
 		}
 		row[i] = sellers[i] - sum_column;
 		sum_column = 0;
 	}
-	for (USI j = 0; j < customers.size(); ++j) {
-		for (USI i = 0; i < sellers.size(); ++i) {
+	for (UINT j = 0; j < customers.size(); ++j) {
+		for (UINT i = 0; i < sellers.size(); ++i) {
 			sum_row += X[i][j];
 		}
 		column[j] = customers[j] - sum_row;
 		sum_row = 0;
 	}
 	sum_row = sum_column = 0;
-	for (USI i = 0; i < sellers.size(); ++i) {
-		for (USI j = 0; j < customers.size(); ++j) {
+	for (UINT i = 0; i < sellers.size(); ++i) {
+		for (UINT j = 0; j < customers.size(); ++j) {
 			sum_row += row[j];
 		}
 		sum_column += column[i];
@@ -167,89 +152,36 @@ void preliminary_stage() {
 	form_X();
 }
 
-enum markers{Nothing, Plus};
-
 class Mark {
 public:
-	vector <short int> row, column;
-	Mark() {
-		row.resize(sellers.size(), Nothing);
-		column.resize(customers.size(), Nothing);
-	}
+	vector <int> markedC, unmarkedC, markedR, unmarkedR;
 	void ing() {
-		for (USI i = 0; i < sellers.size(); ++i) {
-			if (disrepancy.column[i] == 0)
-				column[i] = Plus;
+		for (UINT i = sellers.size(); i >= 0; --i) {
+			if (disrepancy.column[i] == 0) {
+				markedC.push_back(i);
+			}
+			else unmarkedC.push_back(i);
+		}
+		for (UINT i = 0; i < customers.size(); ++i){
+			unmarkedR.push_back(i);
 		}
 	}
 } mark;
 
-vector<pair<int, int> >strokes, stars;
+bool search_stage() {
+	for (UINT i = 0; i < mark.unmarkedC.size(); i++) {
+
+	}
+	return 0;
+}
 
 void correction_stage(){
+	//circuit maker ^_^
 	;
 }
 
-bool isSignificant(int i, int j);
+void eqTransformation_stage() {
 
-inline bool isSignificant(int i, int j) {
-	if (X[i][j] && !C[i][j])
-		return true;
-	return false;
-}
-
-void eq_stage() {
-	double h = DBL_MAX;
-	for (USI j = 0; j < customers.size(); ++j) {
-		vector<short int>::iterator it = find(mark.column.begin(),
-				mark.column.end(), Plus);
-		if (it == mark.column.end() && *mark.column.end() != Plus)
-			continue;
-		for (USI i = 0; i < sellers.size(); ++i) {
-			vector<short int>::iterator it = find(mark.row.begin(),
-					mark.row.end(), Plus);
-			if (it == mark.row.end() && *mark.row.end() != Plus)
-				continue;
-			if (C[i][j] > 0 && C[i][j] < h)
-				h = C[i][j];
-		}
-	}
-	//????????
-}
-
-void search_stage() {
-	for (USI j = 0; j < customers.size(); ++j) {
-		vector<short int>::iterator it = find(mark.column.begin(), mark.column\
-				.end(), Plus);
-		if (it == mark.column.end() && *mark.column.end() != Plus)
-			continue;
-		for (USI i = 0; i < sellers.size(); ++i) {
-			if (C[i][j] == 0) {
-				strokes.push_back(make_pair(i, j));
-				if (disrepancy.row[i] > 0) {
-					correction_stage();
-					return;
-				}
-				else {
-					mark.row[i] = Plus;
-					for (USI k = 0; k < customers.size(); ++k) {
-						vector<short int>::iterator itt =
-								find(mark.column.begin(),
-										mark.column.end(), Nothing);
-						if (it == mark.column.end() && *mark.column.end() != Nothing)
-							continue;
-						if (isSignificant(i, k)) {
-							mark.column[k] = Nothing;
-							stars.push_back(make_pair(i, k));
-						}
-						//may I forgot to search in unmarked column...
-					}
-				}
-			}
-		}
-	}
-	eq_stage();
-	correction_stage();
 }
 
 int main(int argc, char *argv[]) {
@@ -259,21 +191,25 @@ int main(int argc, char *argv[]) {
 	customers_source.assign(customers.begin(), customers.end());
 	preliminary_stage();
 	disrepancy.total = sum(customers) + sum(sellers); //only once
-	for (USI i = 0; i < sellers.size(); ++i) {
+	for (UINT i = 0; i < sellers.size(); ++i) {
 		disrepancy.row[i] = sellers[i];
 	}
-	for (USI i = 0; i < customers.size(); ++i) {
+	for (UINT i = 0; i < customers.size(); ++i) {
 		disrepancy.column[i] = customers[i];
 	}
 	while (disrepancy.total) {
 		mark.ing();
-		search_stage();
+		while(!search_stage()) {
+			eqTransformation_stage();
+		}
+		correction_stage();
+		//TODO DONT FORGET TO CLEAN ZERO-STROKE AND -STAR!!!1111
 	}
 	//Return value of purpose function and matrix.
-	USI pf = 0;
+	UINT pf = 0;
 	ofstream out("outFile");
-	for (USI i = 0; i < sellers_source.size(); ++i) {
-		for (USI j = 0; j < customers_source.size(); ++j) {
+	for (UINT i = 0; i < sellers_source.size(); ++i) {
+		for (UINT j = 0; j < customers_source.size(); ++j) {
 			out << X[i][j] << ' ';
 			pf += X[i][j] * matrix[i][j];
 		}
