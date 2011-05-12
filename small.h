@@ -31,3 +31,44 @@ inline bool isSignificant(int i, int j) {
 		return true;
 	return false;
 }
+
+//In russian we call it 'невязка'
+class Disrepancy {
+public:
+	vector<double>row, column;
+	void compute();
+	double total;
+	Disrepancy();
+} disrepancy;
+
+
+Disrepancy::Disrepancy() {
+	row.resize(sellers.size(), 0);
+	column.resize(customers.size(), 0);
+}
+
+void Disrepancy::compute() {
+	double sum_row = 0, sum_column = 0;
+	for (UINT i = 0; i < sellers.size(); ++i) {
+		for (UINT j = 0; j < customers.size(); ++j) {
+			sum_column += X[i][j];
+		}
+		row[i] = sellers[i] - sum_column;
+		sum_column = 0;
+	}
+	for (UINT j = 0; j < customers.size(); ++j) {
+		for (UINT i = 0; i < sellers.size(); ++i) {
+			sum_row += X[i][j];
+		}
+		column[j] = customers[j] - sum_row;
+		sum_row = 0;
+	}
+	sum_row = sum_column = 0;
+	for (UINT i = 0; i < sellers.size(); ++i) {
+		for (UINT j = 0; j < customers.size(); ++j) {
+			sum_row += row[j];
+		}
+		sum_column += column[i];
+	}
+	total = sum_row + sum_column;
+}

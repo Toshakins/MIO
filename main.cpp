@@ -3,7 +3,7 @@
 #include <fstream>
 #include <algorithm>
 #include <utility>
-#include "small.h"
+#include "iter.h"
 
 using namespace std;
 
@@ -105,83 +105,10 @@ void form_X() {
 	}
 }
 
-//In russian we call it 'невязка'
-class Disrepancy {
-public:
-	vector<double>row, column;
-	void compute();
-	double total;
-	Disrepancy();
-} disrepancy;
-
-
-Disrepancy::Disrepancy() {
-	row.resize(sellers.size(), 0);
-	column.resize(customers.size(), 0);
-}
-
-void Disrepancy::compute() {
-	double sum_row = 0, sum_column = 0;
-	for (UINT i = 0; i < sellers.size(); ++i) {
-		for (UINT j = 0; j < customers.size(); ++j) {
-			sum_column += X[i][j];
-		}
-		row[i] = sellers[i] - sum_column;
-		sum_column = 0;
-	}
-	for (UINT j = 0; j < customers.size(); ++j) {
-		for (UINT i = 0; i < sellers.size(); ++i) {
-			sum_row += X[i][j];
-		}
-		column[j] = customers[j] - sum_row;
-		sum_row = 0;
-	}
-	sum_row = sum_column = 0;
-	for (UINT i = 0; i < sellers.size(); ++i) {
-		for (UINT j = 0; j < customers.size(); ++j) {
-			sum_row += row[j];
-		}
-		sum_column += column[i];
-	}
-	total = sum_row + sum_column;
-}
-
 void preliminary_stage() {
 	balance();
 	form_C();
 	form_X();
-}
-
-class Mark {
-public:
-	vector <int> markedC, unmarkedC, markedR, unmarkedR;
-	void ing() {
-		for (UINT i = sellers.size(); i >= 0; --i) {
-			if (disrepancy.column[i] == 0) {
-				markedC.push_back(i);
-			}
-			else unmarkedC.push_back(i);
-		}
-		for (UINT i = 0; i < customers.size(); ++i){
-			unmarkedR.push_back(i);
-		}
-	}
-} mark;
-
-bool search_stage() {
-	for (UINT i = 0; i < mark.unmarkedC.size(); i++) {
-
-	}
-	return 0;
-}
-
-void correction_stage(){
-	//circuit maker ^_^
-	;
-}
-
-void eqTransformation_stage() {
-
 }
 
 int main(int argc, char *argv[]) {
@@ -203,6 +130,7 @@ int main(int argc, char *argv[]) {
 			eqTransformation_stage();
 		}
 		correction_stage();
+		disrepancy.compute();
 		//TODO DONT FORGET TO CLEAN ZERO-STROKE AND -STAR!!!1111
 	}
 	//Return value of purpose function and matrix.
