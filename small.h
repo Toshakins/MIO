@@ -5,7 +5,12 @@ using namespace std;
 vector<vector<double> > matrix; //addressing: matrix[row][column]
 vector<vector<double> > X;
 vector<vector<double> > C;
+vector<vector<double> > G;
 vector<double> customers, sellers;
+
+enum {
+	No, Stroke, Star
+};
 
 #define UINT unsigned int
 #define MIN(a, b) ((a) < (b)) ? (a) : (b)
@@ -22,8 +27,7 @@ double sum(vector<double> x) {
 }
 
 inline bool comp(int a, int b) {
-	if (a < b) return true;
-	else return false;
+	return (a < b);
 }
 
 inline bool isSignificant(int i, int j) {
@@ -35,12 +39,11 @@ inline bool isSignificant(int i, int j) {
 //In russian we call it 'невязка'
 class Disrepancy {
 public:
-	vector<double>row, column;
+	vector<double> row, column;
 	void compute();
 	double total;
 	Disrepancy();
 } disrepancy;
-
 
 Disrepancy::Disrepancy() {
 	row.resize(sellers.size(), 0);

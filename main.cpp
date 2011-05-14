@@ -24,7 +24,7 @@ void input() {
 			in >> matrix[i][j];
 }
 
-void output(vector <vector <double> > x) {
+void output(vector<vector<double> > x) {
 	for (UINT i = 0; i < sellers.size(); ++i) {
 		cout << ' ' << sellers[i];
 	}
@@ -113,7 +113,7 @@ void preliminary_stage() {
 
 int main(int argc, char *argv[]) {
 	input();
-	vector <double> sellers_source, customers_source;
+	vector<double> sellers_source, customers_source;
 	sellers_source.assign(sellers.begin(), sellers.end());
 	customers_source.assign(customers.begin(), customers.end());
 	preliminary_stage();
@@ -124,9 +124,14 @@ int main(int argc, char *argv[]) {
 	for (UINT i = 0; i < customers.size(); ++i) {
 		disrepancy.column[i] = customers[i];
 	}
+
+	G.resize(C.size());
+	for (UINT i = 0; i < C.size(); ++i)
+		G[i].resize(C[0].size());
+
 	while (disrepancy.total) {
 		mark.ing();
-		while(!search_stage()) {
+		while (!search_stage()) {
 			eqTransformation_stage();
 		}
 		correction_stage();
