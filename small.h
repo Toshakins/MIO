@@ -1,12 +1,16 @@
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
 vector<vector<double> > matrix; //addressing: matrix[row][column]
 vector<vector<double> > X;
 vector<vector<double> > C;
-vector<vector<double> > G;
+vector<vector<double> > G; //here stored marks: strokes'n'stars
 vector<double> customers, sellers;
+
+//last zero with stroke
+pair <int,int> lStroke;
 
 enum {
 	No, Stroke, Star

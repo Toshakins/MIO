@@ -131,6 +131,7 @@ int main(int argc, char *argv[]) {
 
 	while (disrepancy.total) {
 		mark.ing();
+		lStroke.first = lStroke.second = -1;
 		while (!search_stage()) {
 			eqTransformation_stage();
 		}
