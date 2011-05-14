@@ -33,8 +33,8 @@ bool search_stage() {
 			if (C[j][mark.unmarkedC[i]] == 0 && (G[j][mark.unmarkedC[i]]
 					!= Stroke && G[j][mark.unmarkedC[i]] != Star)) {
 				G[j][mark.unmarkedC[i]] = Stroke;
-				lStroke.first = j;
-				lStroke.second = mark.unmarkedC[i];
+				lStroke.first = mark.unmarkedC[i]; //row of begin
+				lStroke.second = j; //column of end
 				if (disrepancy.row[j] > 0)
 					return 1; //call correction of X
 				mark.markedR.push_back(j);
@@ -72,13 +72,29 @@ void eqTransformation_stage() {
 		}
 	}
 	for (UINT i = 0; i < mark.unmarkedR.size(); ++i) {
-			for (UINT j = 0; j < customers.size(); ++j) {
-				C[i][j] -= h;
-			}
+		for (UINT j = 0; j < customers.size(); ++j) {
+			C[i][j] -= h;
 		}
+	}
+}
+
+int getStroke(UINT row) {
+	for (UINT i = 0; i < customers.size(); ++i) {
+		if (G[row][i] == Stroke)
+			return i;
+	}
+	return -1;
+}
+
+int getStar(UINT column) {
+	for (UINT i = 0; i < sellers.size(); ++i) {
+		if (G[i][column] == Star)
+			return i;
+	}
+	return -1;
 }
 
 void correction_stage() {
 	//circuit maker ^_^
-	;
+
 }

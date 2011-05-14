@@ -124,11 +124,9 @@ int main(int argc, char *argv[]) {
 	for (UINT i = 0; i < customers.size(); ++i) {
 		disrepancy.column[i] = customers[i];
 	}
-
 	G.resize(C.size());
 	for (UINT i = 0; i < C.size(); ++i)
 		G[i].resize(C[0].size());
-
 	while (disrepancy.total) {
 		mark.ing();
 		lStroke.first = lStroke.second = -1;
@@ -137,7 +135,6 @@ int main(int argc, char *argv[]) {
 		}
 		correction_stage();
 		disrepancy.compute();
-		//TODO DONT FORGET TO CLEAN ZERO-STROKE AND -STAR!!!1111
 	}
 	//Return value of purpose function and matrix.
 	UINT pf = 0;
