@@ -31,10 +31,7 @@ public:
 } mark;
 
 bool search_stage() {
-	l:output(X);
-	output(C);
-	output(G);
-	for (UINT i = 0; i < mark.unmarkedC.size(); i++) {
+	l:for (UINT i = 0; i < mark.unmarkedC.size(); i++) {
 		for (UINT j = 0; j < sellers.size(); j++) {
 			if ((C[j][mark.unmarkedC[i]] == 0) && ((G[j][mark.unmarkedC[i]]
 					!= Stroke) && (G[j][mark.unmarkedC[i]] != Star))) {
@@ -66,7 +63,7 @@ bool search_stage() {
 }
 
 void eqTransformation_stage() {
-	int h = INT_MAX;
+	double h = INT_MAX;
 	bool found = false;
 	sort(mark.unmarkedC.begin(), mark.unmarkedC.end(), comp);
 	sort(mark.unmarkedR.begin(), mark.unmarkedR.end(), comp);
@@ -114,7 +111,7 @@ int getStar(UINT column) {
 
 struct container {
 	int x, y;
-	int val;
+	double val;
 };
 
 bool containerComp(container a, container b);
@@ -141,7 +138,7 @@ void correction_stage() {
 			col_of_star = col_of_stroke;
 		}
 	}
-	int teta;
+	double teta;
 	if (strokes.size() != 1) {
 		//prepare for combo!
 		teta = min(
