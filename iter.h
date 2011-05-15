@@ -65,6 +65,10 @@ void eqTransformation_stage() {
 			}
 		}
 	}
+	if (!found) {
+		cout << "Can't transform C" << endl;
+		exit(0);
+	}
 	//add to marked columns and subtract from unmarked rows
 	for (UINT i = 0; i < sellers.size(); ++i) {
 		for (UINT j = 0; j < mark.markedC.size(); ++j) {
@@ -94,7 +98,19 @@ int getStar(UINT column) {
 	return -1;
 }
 
+struct container {
+	int x, y;
+	double val;
+};
+
 void correction_stage() {
 	//circuit maker ^_^
-
+	int t1, t2;
+	vector <container> stars, strokes;
+	l:if ((t1 = getStar(lStroke.first)) >= 0) {
+		if ((t2 = getStroke(t1)) >= 0) {
+			lStroke.second = t2;//column of end
+			goto l;
+		}
+	}
 }
