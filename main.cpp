@@ -118,16 +118,18 @@ int main(int argc, char *argv[]) {
 	customers_source.assign(customers.begin(), customers.end());
 	preliminary_stage();
 	disrepancy.total = sum(customers) + sum(sellers); //only once
-	for (UINT i = 0; i < sellers.size(); ++i) {
-		disrepancy.row[i] = sellers[i];
-	}
+	disrepancy.row.resize(sellers.size(), 0);
+	disrepancy.column.resize(customers.size(), 0);
 	for (UINT i = 0; i < customers.size(); ++i) {
-		disrepancy.column[i] = customers[i];
+		disrepancy.row[i] = customers[i];
+	}
+	for (UINT i = 0; i < sellers.size(); ++i) {
+		disrepancy.column[i] = sellers[i];
 	}
 	G.resize(C.size());
 	for (UINT i = 0; i < C.size(); ++i)
 		G[i].resize(C[0].size());
-	while (disrepancy.total) {
+	while ((sum(disrepancy.row) + sum(disrepancy.column)) - disrepancy.total) {
 		mark.ing();
 		lStroke.first = lStroke.second = -1;
 		while (!search_stage()) {

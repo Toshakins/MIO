@@ -1,6 +1,7 @@
 #include <vector>
 #include <algorithm>
 #include "small.h"
+#include <cstdlib>
 
 using namespace std;
 
@@ -15,13 +16,13 @@ public:
 			}
 		}
 		markedC.clear(), unmarkedC.clear(), markedR.clear(), unmarkedR.clear();
-		for (UINT i = sellers.size(); i >= 0; --i) {
+		for (int i = customers.size() - 1; i >= 0; --i) {
 			if (disrepancy.column[i] == 0) {
 				markedC.push_back(i);
 			} else
 				unmarkedC.push_back(i);
 		}
-		for (UINT i = 0; i < customers.size(); ++i) {
+		for (UINT i = 0; i < sellers.size(); ++i) {
 			unmarkedR.push_back(i);
 		}
 	}
@@ -29,9 +30,9 @@ public:
 
 bool search_stage() {
 	for (UINT i = 0; i < mark.unmarkedC.size(); i++) {
-		for (UINT j = 0; j < customers.size(); j++) {
-			if (C[j][mark.unmarkedC[i]] == 0 && (G[j][mark.unmarkedC[i]]
-					!= Stroke && G[j][mark.unmarkedC[i]] != Star)) {
+		for (UINT j = 0; j < sellers.size(); j++) {
+			if ((C[j][mark.unmarkedC[i]] == 0) && ((G[j][mark.unmarkedC[i]]
+					!= Stroke) || (G[j][mark.unmarkedC[i]] != Star))) {
 				G[j][mark.unmarkedC[i]] = Stroke;
 				lStroke.first = mark.unmarkedC[i]; //row of begin
 				lStroke.second = j; //column of end
@@ -41,9 +42,10 @@ bool search_stage() {
 				remove(mark.unmarkedR.begin(), mark.unmarkedR.end(), j);
 				sort(mark.markedC.begin(), mark.markedC.end(), comp);
 				for (UINT k = 0; k < mark.markedC.size(); ++k) {
-					if (isSignificant(j, k)) {
-						G[j][k] = Star;
-						remove(mark.markedC.begin(), mark.markedC.end(), k);
+					if (isSignificant(j, mark.markedC[k])) {
+						G[j][mark.markedC[k]] = Star;
+						remove(mark.markedC.begin(), mark.markedC.end(),
+								mark.markedC[k]);
 					}
 				}
 			}
@@ -59,25 +61,26 @@ void eqTransformation_stage() {
 	sort(mark.unmarkedR.begin(), mark.unmarkedR.end(), comp);
 	for (UINT i = 0; i < mark.unmarkedR.size(); ++i) {
 		for (UINT j = 0; j < mark.unmarkedC.size(); ++j) {
-			if (C[i][j] > 0 && C[i][j] > h) {
-				h = C[i][j];
+			if ((C[mark.unmarkedR[i]][mark.unmarkedC[j]] > 0)
+					&& (C[mark.unmarkedR[i]][mark.unmarkedC[j]] > h)) {
+				h = C[mark.unmarkedR[i]][mark.unmarkedC[j]];
 				found = true;
 			}
 		}
 	}
 	if (!found) {
-		cout << "Can't transform C" << endl;
-		exit(0);
+		system("echo 'Can not transform C'");
+		exit(1);
 	}
 	//add to marked columns and subtract from unmarked rows
 	for (UINT i = 0; i < sellers.size(); ++i) {
 		for (UINT j = 0; j < mark.markedC.size(); ++j) {
-			C[i][j] += h;
+			C[i][mark.markedC[j]] += h;
 		}
 	}
 	for (UINT i = 0; i < mark.unmarkedR.size(); ++i) {
 		for (UINT j = 0; j < customers.size(); ++j) {
-			C[i][j] -= h;
+			C[mark.unmarkedR[i]][j] -= h;
 		}
 	}
 }
@@ -127,15 +130,25 @@ void correction_stage() {
 			col_of_star = col_of_stroke;
 		}
 	}
-	//prepare for combo!
-	double teta = min(
-			min_element(stars.begin(), stars.end(), containerComp)->val,
-			min(disrepancy.row[lStroke.first],
-					disrepancy.column[lStroke.second]));
+	double teta;
+	if (strokes.size() != 1) {
+		//prepare for combo!
+		teta = min(
+				min_element(stars.begin(), stars.end(), containerComp)->val,
+				min(disrepancy.row[lStroke.first],
+						disrepancy.column[lStroke.second]));
+	} else {
+		teta = min(disrepancy.row[lStroke.first],
+				disrepancy.column[lStroke.second]);
+	}
 	for (UINT i = 0; i < strokes.size(); ++i) {
 		X[strokes[i].x][strokes[i].y] += teta;
+		disrepancy.row[strokes[i].x] -= teta;
+		disrepancy.column[strokes[i].y] -= teta;
 	}
 	for (UINT i = 0; i < stars.size(); ++i) {
-			X[stars[i].x][stars[i].y] -= teta;
-		}
+		X[stars[i].x][stars[i].y] -= teta;
+		disrepancy.row[stars[i].x] += teta;
+		disrepancy.column[stars[i].y] -= teta;
+	}
 }

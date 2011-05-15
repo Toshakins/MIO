@@ -46,13 +46,7 @@ public:
 	vector<double> row, column;
 	void compute();
 	double total;
-	Disrepancy();
 } disrepancy;
-
-Disrepancy::Disrepancy() {
-	row.resize(sellers.size(), 0);
-	column.resize(customers.size(), 0);
-}
 
 void Disrepancy::compute() {
 	double sum_row = 0, sum_column = 0;
@@ -70,12 +64,10 @@ void Disrepancy::compute() {
 		column[j] = customers[j] - sum_row;
 		sum_row = 0;
 	}
-	sum_row = sum_column = 0;
+	total = 0;
 	for (UINT i = 0; i < sellers.size(); ++i) {
 		for (UINT j = 0; j < customers.size(); ++j) {
-			sum_row += row[j];
+			total += X[i][j];
 		}
-		sum_column += column[i];
 	}
-	total = sum_row + sum_column;
 }
