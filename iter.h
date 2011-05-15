@@ -103,14 +103,39 @@ struct container {
 	double val;
 };
 
+bool containerComp(container a, container b);
+inline bool containerComp(container a, container b) {
+	return (a.val < b.val);
+}
+
 void correction_stage() {
 	//circuit maker ^_^
-	int t1, t2;
-	vector <container> stars, strokes;
-	l:if ((t1 = getStar(lStroke.first)) >= 0) {
-		if ((t2 = getStroke(t1)) >= 0) {
-			lStroke.second = t2;//column of end
-			goto l;
+	int row_of_star, col_of_stroke, col_of_star = lStroke.first;
+	vector<container> stars, strokes;
+	container tmp;
+	tmp.x = lStroke.first, tmp.y = lStroke.second, tmp.val
+			= X[lStroke.first][lStroke.second];
+	strokes.push_back(tmp);
+	while ((row_of_star = getStar(col_of_star)) >= 0) {
+		if ((col_of_stroke = getStroke(row_of_star)) >= 0) {
+			tmp.x = row_of_star, tmp.y = col_of_star, tmp.val = X[tmp.x][tmp.y];
+			stars.push_back(tmp);
+			tmp.x = row_of_star, tmp.y = col_of_stroke, tmp.val
+					= X[tmp.x][tmp.y];
+			strokes.push_back(tmp);
+			lStroke.second = col_of_stroke;//column of end
+			col_of_star = col_of_stroke;
 		}
 	}
+	//prepare for combo!
+	double teta = min(
+			min_element(stars.begin(), stars.end(), containerComp)->val,
+			min(disrepancy.row[lStroke.first],
+					disrepancy.column[lStroke.second]));
+	for (UINT i = 0; i < strokes.size(); ++i) {
+		X[strokes[i].x][strokes[i].y] += teta;
+	}
+	for (UINT i = 0; i < stars.size(); ++i) {
+			X[stars[i].x][stars[i].y] -= teta;
+		}
 }
