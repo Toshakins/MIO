@@ -24,6 +24,9 @@ int main(int argc, char *argv[]) {
 		}
 		correction_stage();
 		disrepancy.compute();
+		output(X);
+		output(C);
+		output(G);
 	}
 	//Return value of purpose function and matrix.
 	UINT pf = 0;

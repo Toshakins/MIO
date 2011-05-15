@@ -1,13 +1,13 @@
 #include <vector>
 
-void out(vector <double> x) {
+void out(vector <int> x) {
 	for (UINT i = 0; i < x.size(); ++i) {
 		cout << ' ' << x[i];
 	}
 	cout << endl;
 }
 
-void output(vector<vector<double> > x) {
+void output(vector<vector<int> > x) {
 	for (UINT i = 0; i < sellers.size(); ++i) {
 		cout << ' ' << sellers[i];
 	}
